@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const typeDefs = require('./graphQL/schema/index');
 const resolvers = require('./graphQL/resolver/index');
 const { GraphQLServer } = require('graphql-yoga');
+const policyModels = require('./model/policy');
+const contextModel = require('./model/contextModel');
+
 
 const dataPointModels = require('./model/dataPoint');
 
@@ -33,14 +36,38 @@ client.on('connect', () => {
 
 
 //Receber mensagem
-client.on('message', (topic, payload) => {
-  
-    var timestamp = new Date().getTime();
-    console.log(timestamp);
-    console.log('Received Message:', topic, payload.toString())
-
+client.on('message', function (topic, payload) {
+    var time;
     
+    try {
+      var msg = JSON.parse(JSON.stringify(payload.toString())); 
+      var timeArduino = msg.split(':')[4];
+      time = timeArduino.slice(0,  - 1);
+      var getPointsAllowed = [];
+      var getAllPointsAllowed = [];
+      const getPolicies =  policyModels.find();
+      console.log("Get",getPolicies)         
+      /* find points that satisfy the policies*/
+      
+      
+    } catch (err) {
+      // 👇️ This runs
+      console.log('Error: ', err.message);
+    }
+    var timestamp = new Date().getTime()/1000;
+    console.log('timestamp: ',Math.round(timestamp))
+    console.log('time: ',time)
+    var latency = Math.round(timestamp) - time;
+    console.log("latencia", latency)
+    var lat = new Date()
+    //console.log('Received Message:', topic, packet.payload)
+    //console.log(JSON.parse(JSON.stringify(packet.payload.toString()))); 
 
+    //const obj = JSON.parse(JSON.stringify(packet.payload.toString()))
+    //console.log(obj[0])
+    //var latency = timestamp - Date.parse(obj.timestamp);
+    //console.log("latency: ", o.time);
+   
 
   })
 
